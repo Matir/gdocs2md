@@ -239,6 +239,10 @@ function findPrefix(inSrc, element, listCounters) {
 }
 
 function processTextElement(inSrc, txt) {
+  var isCodeFont = function(fname) {
+    return (fname === "Consolas" || fname === "Courier New");
+  };
+
   if (typeof(txt) === 'string') {
     return txt;
   }
@@ -264,11 +268,12 @@ function processTextElement(inSrc, txt) {
       }
       pOut=pOut.substring(0, off)+'['+pOut.substring(off, lastOff)+']('+url+')'+pOut.substring(lastOff);
     } else if (font) {
-      if (!inSrc && font===font.COURIER_NEW) {
-        while (i>=1 && txt.getFontFamily(attrs[i-1]) && txt.getFontFamily(attrs[i-1])===font.COURIER_NEW) {
-          // detect fonts that are in multiple pieces because of errors on formatting:
-          i-=1;
-          off=attrs[i];
+      if (!inSrc && isCodeFont(font)) {
+        while (i>=1 && txt.getFontFamily(attrs[i-1]) &&
+          isCodeFont(txt.getFontFamily(attrs[i-1]))) {
+            // detect fonts that are in multiple pieces because of errors on formatting:
+            i-=1;
+            off=attrs[i];
         }
         pOut=pOut.substring(0, off)+'`'+pOut.substring(off, lastOff)+'`'+pOut.substring(lastOff);
       }
